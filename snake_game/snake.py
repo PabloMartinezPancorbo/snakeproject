@@ -34,6 +34,29 @@ score = 0
 
 # Clock to control game speed
 clock = pygame.time.Clock()
+def landing_screen():
+    screen.fill(black)
+    font = pygame.font.Font('freesansbold.ttf', 32)
+    title_text = font.render("Welcome to Snake Game", True, white)
+    option1_text = font.render("Press 1 to Play Yourself", True, white)
+    option2_text = font.render("Press 2 for RL Agent to Play", True, white)
+    
+    screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 100))
+    screen.blit(option1_text, (screen_width // 2 - option1_text.get_width() // 2, 200))
+    screen.blit(option2_text, (screen_width // 2 - option2_text.get_width() // 2, 300))
+    
+    pygame.display.update()
+    
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_1:  # User chooses to play themselves
+                    return 'user'
+                elif event.key == pygame.K_2:  # User chooses the RL agent
+                    return 'agent'
 
 def draw_snake(snake_body):
     for pos in snake_body:
@@ -219,4 +242,11 @@ def game_over():
 
 
 if __name__ == "__main__":
-    main()
+    choice = landing_screen()
+    
+    if choice == 'user':
+        main()  # Start the game with user control
+    elif choice == 'agent':
+        # Import and start the RL agent's gameplay logic
+        from rl_agent import rl_main  # Ensure rl_main.py exists in the rl_agent folder
+        rl_main()  # Call the RL agent's main function
