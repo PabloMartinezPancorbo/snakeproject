@@ -19,10 +19,10 @@ This project is an enhanced version of the classic Snake Game built using Python
 ```bash
 poetry shell
 ```
-    - If you don't have poetry already install, you may run:
-    ```bash
+-   If you don't have poetry already install, you may run:
+```bash
     curl -sSL https://install.python-poetry.org | python3 -
-    ```
+```
 - Run the following command in a UNIX terminal:
 ```bash
 python snake_game/snake.py
