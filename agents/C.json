@@ -1,8 +1,0 @@
-{
-  "name": "C",
-  "learning_rate": 0.15,
-  "discount_factor": 0.9,
-  "exploration_rate": 0.08297049016010075,
-  "learning_cycles": 0,
-  "history": []
-}

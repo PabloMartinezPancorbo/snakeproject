@@ -1,3 +1,5 @@
+# snake.py
+
 import pygame
 import sys
 import random
@@ -14,15 +16,13 @@ from game_objects import (
     black,
     white,
     green,
+    red,  # Ensure red is imported
 )
-from rl_agent import rl_main, list_agents, create_agent
+from rl_agent import rl_main, list_agents, create_agent, display_text_input
 from high_score_utils import read_high_scores, update_high_scores
 
 # Initialize Pygame
 pygame.init()
-
-# Define additional colors
-red = (255, 0, 0)
 
 # High score file
 HIGH_SCORES_FILE = "high_scores.json"
@@ -69,14 +69,7 @@ def view_high_scores():
                 sys.exit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
-                    choice = landing_screen()
-                    if choice == "user":
-                        main()
-                    elif choice == "agent_options":
-                        handle_agent_options()
-                    elif choice == "view_scores":
-                        view_high_scores()
-                    return  # Exit the function after handling the choice
+                    return  # Exit the function to return to the landing screen
         clock.tick(30)
 
 
@@ -153,8 +146,7 @@ def game_over(score):
 
     pygame.display.update()
 
-    # Wait for input to continue or quit, or timeout after 10 seconds
-    start_time = pygame.time.get_ticks()
+    # Wait for input to continue or quit
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -162,17 +154,11 @@ def game_over(score):
                 sys.exit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:  # Press Enter to play again
-                    # Restart the game by re-executing the script
-                    os.execv(sys.executable, [sys.executable] + sys.argv)
+                    main()
+                    return
                 elif event.key == pygame.K_ESCAPE:  # Press ESC to quit
                     pygame.quit()
                     sys.exit()
-
-        # Check if 10 seconds have passed
-        if pygame.time.get_ticks() - start_time > 10000:
-            pygame.quit()
-            sys.exit()
-
         clock.tick(30)
 
 
@@ -203,6 +189,7 @@ def landing_screen():
                     return "agent_options"
                 elif event.key == pygame.K_3:  # User wants to view high scores
                     return "view_scores"
+        clock.tick(30)
 
 
 def agent_options_screen():
@@ -216,10 +203,8 @@ def agent_options_screen():
         screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 50))
 
         if agents:
-            agent_texts = []
             for i, agent in enumerate(agents, start=1):
                 agent_text = font.render(f"{i}. {agent}", True, white)
-                agent_texts.append(agent_text)
                 screen.blit(agent_text, (100, 100 + i * 40))
             create_agent_text = font.render(
                 "Press C to Create a New Agent", True, white
@@ -263,10 +248,36 @@ def agent_options_screen():
                 elif event.key == pygame.K_c:
                     agent_name = text_input_screen("Enter Agent Name:")
                     if agent_name:
-                        create_agent(agent_name)
+                        # Collect parameters using display_text_input from rl_agent.py
+                        learning_rate = display_text_input(
+                            "Enter learning rate (default 0.2):", 0.2
+                        )
+                        discount_factor = display_text_input(
+                            "Enter discount factor (default 0.8):", 0.8
+                        )
+                        exploration_rate = display_text_input(
+                            "Enter exploration rate (default 0.9):", 0.9
+                        )
+                        exploration_decay = display_text_input(
+                            "Enter exploration decay (default 0.895):", 0.895
+                        )
+                        min_exploration_rate = display_text_input(
+                            "Enter min exploration rate (default 0.1):", 0.1
+                        )
+
+                        # Create the agent using the function from rl_agent.py
+                        create_agent(
+                            agent_name,
+                            learning_rate,
+                            discount_factor,
+                            exploration_rate,
+                            exploration_decay,
+                            min_exploration_rate,
+                        )
                         agents = list_agents()  # Refresh the agent list
                 elif event.key == pygame.K_b:
                     return  # Go back to the landing screen
+        clock.tick(30)
 
 
 def mode_selection_screen():
@@ -300,6 +311,7 @@ def mode_selection_screen():
                     return "static"
                 elif event.key == pygame.K_b:
                     return None  # Go back to agent options
+        clock.tick(30)
 
 
 def text_input_screen(prompt):
@@ -337,6 +349,7 @@ def text_input_screen(prompt):
                     input_text = input_text[:-1]
                 else:
                     input_text += event.unicode
+        clock.tick(30)
 
 
 def main():
@@ -412,9 +425,11 @@ def main():
             or snake_pos[1] >= screen_height
         ):
             game_over(score)
+            return
         for block in snake_body[1:]:
             if snake_pos[0] == block[0] and snake_pos[1] == block[1]:
                 game_over(score)
+                return
 
         # Display background and elements
         screen.fill(black)
@@ -428,43 +443,6 @@ def main():
 
         pygame.display.update()
         clock.tick(10)
-
-
-def handle_agent_options():
-    agents = list_agents()
-    if agents:
-        print("\nExisting Agents:")
-        for i, agent in enumerate(agents, start=1):
-            print(f"{i}. {agent}")
-        print("Press C to create a new agent")
-
-        agent_selected = False
-        while not agent_selected:
-            event = pygame.event.wait()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_c:  # Create a new agent
-                    agent_name = input("Enter a name for the new agent: ")
-                    create_agent(agent_name)
-                    print(f"Agent {agent_name} created.")
-                    break
-                elif pygame.K_1 <= event.key <= pygame.K_9:
-                    agent_index = event.key - pygame.K_1
-                    if agent_index < len(agents):
-                        selected_agent = agents[agent_index]
-                        mode = input("Choose mode (learning/static): ").lower()
-                        rl_main(selected_agent, mode)
-                        agent_selected = True
-                        break
-    else:
-        print("No agents found. Press C to create a new agent.")
-        while True:
-            event = pygame.event.wait()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_c:
-                    agent_name = input("Enter a name for the new agent: ")
-                    create_agent(agent_name)
-                    print(f"Agent {agent_name} created.")
-                    break
 
 
 if __name__ == "__main__":
