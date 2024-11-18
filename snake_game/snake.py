@@ -70,6 +70,10 @@ def save_high_score(score, file_path="high_score.txt"):
 
 def main():
     global snake_pos, snake_body, snake_direction, change_to, food_pos, food_spawn, score
+
+    # Read the highest score at the start of the game
+    high_score = read_high_score()
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -105,9 +109,16 @@ def main():
 
         # Game Over conditions
         if snake_pos[0] < 0 or snake_pos[0] >= screen_width or snake_pos[1] < 0 or snake_pos[1] >= screen_height:
+            if score > high_score:
+                save_high_score(score)
+                high_score = score  # Update high_score for display purposes
             game_over()
+
         for segment in snake_body[1:]:
             if snake_pos[0] == segment[0] and snake_pos[1] == segment[1]:
+                if score > high_score:
+                    save_high_score(score)
+                    high_score = score  # Update high_score for display purposes
                 game_over()
 
         # Clear the screen
@@ -119,9 +130,9 @@ def main():
         # Draw the food
         draw_food(food_pos)
 
-        # Display score
+        # Display score and high score
         score_font = pygame.font.Font('freesansbold.ttf', 32)
-        score_surface = score_font.render("Score : " + str(score), True, white)
+        score_surface = score_font.render(f"Score : {score}  High Score : {high_score}", True, white)
         score_rect = score_surface.get_rect()
         screen.blit(score_surface, score_rect)
 
