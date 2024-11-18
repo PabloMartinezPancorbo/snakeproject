@@ -30,5 +30,6 @@ python snake_game/snake.py
 
 **Usage**:
 - Controls: Use arrow keys to control the snake.
+![alt text](game_in_action.png)
 - Game Over: Input your name when prompted after losing, and see your score ranked on the top 5 list.
 - Replay or Exit: Press Enter to play again or ESC to exit. The game automatically closes after 10 seconds if no input is detected.
