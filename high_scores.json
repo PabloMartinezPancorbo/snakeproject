@@ -1,22 +1,7 @@
 [
-    {
-        "name": "test_name1",
-        "score": 2
-    },
-    {
-        "name": "Leroy",
-        "score": 2
-    },
-    {
-        "name": "johnnyboy",
-        "score": 1
-    },
-    {
-        "name": "PabloTio",
-        "score": 1
-    },
-    {
-        "name": "Boy",
-        "score": 1
-    }
+  { "name": "optimus-159-20241118", "score": 4 },
+  { "name": "optimus-201-20241118", "score": 4 },
+  { "name": "optimus-209-20241118", "score": 4 },
+  { "name": "optimus-83-20241118", "score": 3 },
+  { "name": "optimus-122-20241118", "score": 3 }
 ]
